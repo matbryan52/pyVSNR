@@ -3,21 +3,22 @@ Main VSNR functions
 """
 import os
 import pathlib
-from ctypes import POINTER, c_int, c_float
+from ctypes import POINTER, c_int, c_float, CDLL
 import numpy as np
 
 PRECOMPILED_PATH = pathlib.Path(__file__).parent / "precompiled"
-
+os.add_dll_directory(str(PRECOMPILED_PATH))
 
 def get_dll():
     if os.name == 'nt':
-        from ctypes import windll
-        dll = windll.LoadLibrary(PRECOMPILED_PATH / "libvsnr2d.dll")
+        dll = CDLL(
+            str(PRECOMPILED_PATH / "libvsnr2d.dll"),
+            winmode=0,
+        )
     else:
-        from ctypes import cdll
         # nvcc -lcufft -lcublas --compiler-options '-fPIC'
         # -o precompiled/libvsnr2d.so --shared vsnr2d.cu
-        dll = cdll.LoadLibrary(PRECOMPILED_PATH / "libvsnr2d.so")
+        dll = CDLL(str(PRECOMPILED_PATH / "libvsnr2d.so"))
     return dll
 
 
