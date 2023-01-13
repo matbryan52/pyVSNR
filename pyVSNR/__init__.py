@@ -2,15 +2,28 @@
 Main VSNR functions
 """
 import os
-from ctypes import windll, POINTER, c_int, c_float
+import pathlib
+from ctypes import POINTER, c_int, c_float
 import numpy as np
 
-PRECOMPILED_PATH = os.path.join(__file__, "..", "precompiled")
+PRECOMPILED_PATH = pathlib.Path(__file__).parent / "precompiled"
+
+
+def get_dll():
+    if os.name == 'nt':
+        from ctypes import windll
+        dll = windll.LoadLibrary(PRECOMPILED_PATH / "libvsnr2d.dll")
+    else:
+        from ctypes import cdll
+        # nvcc -lcufft -lcublas --compiler-options '-fPIC'
+        # -o precompiled/libvsnr2d.so --shared vsnr2d.cu
+        dll = cdll.LoadLibrary(PRECOMPILED_PATH / "libvsnr2d.so")
+    return dll
 
 
 def get_vsnr2d():
     """ Load the 'cuda' function from the dedicated .dll library"""
-    dll = windll.LoadLibrary(os.path.join(PRECOMPILED_PATH, "libvsnr2d.dll"))
+    dll = get_dll()
     func = dll.VSNR_2D_FIJI_GPU
     func.argtypes = [POINTER(c_float), c_int, POINTER(c_float),
                      c_int, c_int, c_int,
@@ -20,7 +33,7 @@ def get_vsnr2d():
 
 def get_nblocks():
     """ Get the number of maximum threads per block library"""
-    dll = windll.LoadLibrary(os.path.join(PRECOMPILED_PATH, "libvsnr2d.dll"))
+    dll = get_dll()
     return dll.getMaxBlocks()
 
 
