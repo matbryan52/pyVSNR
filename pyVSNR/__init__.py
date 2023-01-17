@@ -7,12 +7,12 @@ from ctypes import POINTER, c_int, c_float, CDLL
 import numpy as np
 
 PRECOMPILED_PATH = pathlib.Path(__file__).parent
-os.add_dll_directory(str(PRECOMPILED_PATH))
 
 
 def get_dll():
     try:
         if os.name == 'nt':
+            os.add_dll_directory(str(PRECOMPILED_PATH))
             return CDLL(
                 str(PRECOMPILED_PATH / "libvsnr2d.dll"),
                 winmode=0,
