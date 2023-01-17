@@ -1,0 +1,8 @@
+graft data/
+include tests.py
+include examples.py
+include pyVSNR/*.cu
+include pyVSNR/*.so
+include pyVSNR/*.dll
+include pyVSNR/*.lib
+include pyVSNR/*.exp

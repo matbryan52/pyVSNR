@@ -2,6 +2,7 @@
 Examples of VSNR algorithm applications
 """
 import os
+import pathlib
 import time
 import numpy as np
 import matplotlib.pyplot as plt
@@ -9,7 +10,7 @@ from skimage.io import imread, imsave
 
 from pyVSNR import vsnr2d
 
-DATA_PATH = os.path.join(__file__, "..", "data")
+DATA_PATH = pathlib.Path(__file__).parent / 'data'
 SAVE_IMG = False
 
 
