@@ -18,13 +18,15 @@ It completes the 2D-CPU/GPU port from MATLAB to python realized in
     $ pip install git+https://github.com/CEA-MetroCarac/pyVSNR.git
 
 In case of problem during CUDA execution (typically 'access memory error'), 
-it may be necessary to **recompile** the .dll.
-See the [README.txt](pyVSNR/README.txt) file for more details.
+it may be necessary to **recompile** the shared library from source (see below).
 
 ## Requirements
 
 - numpy
 - matplotlib, skimage (for examples and tests execution only)
+
+A working CUDA installation and compatible GPU. Tested and compiled
+for CUDA 11.
 
 ## Usage
 
@@ -52,8 +54,7 @@ For more details concerning usage and parameters, refer to the Pierre Weiss
 ## Examples
 
 Some applicative examples are given in 
-[examples.py](pyVSNR/examples.py). Operating mode and results are
- reproduced hereafter. 
+[examples.py](examples.py), and below:
 
 
 **Gaussian noise removal example** :
@@ -62,7 +63,7 @@ Some applicative examples are given in
 from pyVSNR.examples import ex_camera_gaussian_noise 
 ex_camera_gaussian_noise() 
 ```
-![](pyVSNR/data/camera_gaussian_noise_comp.png)
+![](data/camera_gaussian_noise_comp.png)
  
 **Stripes removal example** :
 
@@ -70,7 +71,7 @@ ex_camera_gaussian_noise()
 from pyVSNR.examples import ex_camera_stripes 
 ex_camera_stripes()
 ```
-![](pyVSNR/data/camera_stripes_comp.png)
+![](data/camera_stripes_comp.png)
 
 **Curtains removal example** :
 
@@ -78,7 +79,7 @@ ex_camera_stripes()
 from pyVSNR.examples import ex_camera_curtains 
 ex_camera_curtains()
 ```
-![](pyVSNR/data/camera_curtains_comp.png)
+![](data/camera_curtains_comp.png)
 
 **Curtains removal example on real image (FIB-SEM)** :
 
@@ -86,13 +87,39 @@ ex_camera_curtains()
 from pyVSNR.examples import ex_fib_sem
 ex_fib_sem(show_plot=True)
 ```
-![](pyVSNR/data/fib_sem_comp.png)
+![](data/fib_sem_comp.png)
 
+
+## Shared library re-compilation
+
+If you encounter shared library load errors then you may need
+to recompile from source. This requires a working CUDA installation
+with `nvcc` compiler. The source code is distributed with this package
+and is found in the install directory, find this using:
+
+```bash
+python -c 'import pyVSNR; print(pyVSNR.PRECOMPILED_PATH)'
+...
+```
+
+Navigate to this directory and re-compile for your system using the following, on linux:
+
+```bash
+cd ...
+nvcc -lcufft -lcublas --compiler-options '-fPIC' -o libvsnr2d.so --shared vsnr2d.cu
+```
+
+and on Windows:
+
+```powershell
+cd ...
+nvcc -lcufft -lcublas -o libvsnr2d.dll --shared vsnr2d.cu
+```
 
 ## Authors informations
 
 This is a port to python of the original code developed by Jean EYMERIE
- and Pierre WEISS.
+and Pierre WEISS.
 
 All credit goes to the original authors.
 
