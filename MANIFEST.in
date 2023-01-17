@@ -1,0 +1,5 @@
+include pyVSNR/*.cu
+include pyVSNR/*.so
+include pyVSNR/*.dll
+include pyVSNR/*.lib
+include pyVSNR/*.exp

@@ -6,19 +6,23 @@ import pathlib
 from ctypes import POINTER, c_int, c_float
 import numpy as np
 
-PRECOMPILED_PATH = pathlib.Path(__file__).parent / "precompiled"
+PRECOMPILED_PATH = pathlib.Path(__file__).parent
 
 
 def get_dll():
-    if os.name == 'nt':
-        from ctypes import windll
-        dll = windll.LoadLibrary(PRECOMPILED_PATH / "libvsnr2d.dll")
-    else:
-        from ctypes import cdll
-        # nvcc -lcufft -lcublas --compiler-options '-fPIC'
-        # -o precompiled/libvsnr2d.so --shared vsnr2d.cu
-        dll = cdll.LoadLibrary(PRECOMPILED_PATH / "libvsnr2d.so")
-    return dll
+    try:
+        if os.name == 'nt':
+            from ctypes import windll
+            return windll.LoadLibrary(PRECOMPILED_PATH / "libvsnr2d.dll")
+        else:
+            from ctypes import cdll
+            # nvcc -lcufft -lcublas --compiler-options '-fPIC'
+            # -o precompiled/libvsnr2d.so --shared vsnr2d.cu
+            return cdll.LoadLibrary(PRECOMPILED_PATH / "libvsnr2d.so")
+    except OSError as err:
+        raise OSError('Problem loading the compiled library from '
+                      f'{PRECOMPILED_PATH}, please try recompiling '
+                      '(see readme)') from err
 
 
 def get_vsnr2d():
@@ -105,14 +109,8 @@ def vsnr2d(img, filters, nite=20, beta=10., nblocks='auto'):
 
     # calculation
     vmax = u0.max()
-    try:
-        get_vsnr2d()(psis_, length, u0_, n0, n1, nite, beta, u_, nblocks, vmax)
-    except OSError:
-        dir_path = os.path.dirname(os.path.realpath(__file__))
-        msg = '\n!!! Problem when running the cuda libvsnr2d.dll !!!\n'
-        msg += 'You probably need to recompile the .dll\n'
-        msg += f'See the README.txt for compilation instructions in {dir_path}'
-        print(msg)
+    vsnr_func = get_vsnr2d()
+    vsnr_func(psis_, length, u0_, n0, n1, nite, beta, u_, nblocks, vmax)
 
     # reshaping
     img_corr = np.array(u_).reshape(n0, n1).astype(float)

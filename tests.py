@@ -4,8 +4,8 @@ unittest
 import unittest
 import numpy as np
 
-from pyVSNR.examples import (ex_camera_gaussian_noise, ex_camera_stripes,
-                             ex_camera_curtains)
+from examples import (ex_camera_gaussian_noise, ex_camera_stripes,
+                      ex_camera_curtains)
 
 
 class TestVSNR(unittest.TestCase):
