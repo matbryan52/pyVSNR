@@ -44,6 +44,12 @@ jobs:
     - name: Build package
       run:
         python -m build
+    - name: Upload package
+      uses: actions/upload-artifact@v3
+      with:
+        name: package-upload
+        path: |
+          dist
 #     - name: Lint with flake8
 #       run: |
 #         # stop the build if there are Python syntax errors or undefined names
