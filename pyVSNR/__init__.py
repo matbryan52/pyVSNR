@@ -3,22 +3,24 @@ Main VSNR functions
 """
 import os
 import pathlib
-from ctypes import POINTER, c_int, c_float
+from ctypes import POINTER, c_int, c_float, CDLL
 import numpy as np
 
 PRECOMPILED_PATH = pathlib.Path(__file__).parent
+os.add_dll_directory(str(PRECOMPILED_PATH))
 
 
 def get_dll():
     try:
         if os.name == 'nt':
-            from ctypes import windll
-            return windll.LoadLibrary(PRECOMPILED_PATH / "libvsnr2d.dll")
+            return CDLL(
+                str(PRECOMPILED_PATH / "libvsnr2d.dll"),
+                winmode=0,
+            )
         else:
-            from ctypes import cdll
             # nvcc -lcufft -lcublas --compiler-options '-fPIC'
             # -o precompiled/libvsnr2d.so --shared vsnr2d.cu
-            return cdll.LoadLibrary(PRECOMPILED_PATH / "libvsnr2d.so")
+            return CDLL(str(PRECOMPILED_PATH / "libvsnr2d.so"))
     except OSError as err:
         raise OSError('Problem loading the compiled library from '
                       f'{PRECOMPILED_PATH}, please try recompiling '
