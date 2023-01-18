@@ -57,6 +57,7 @@ jobs:
     - if: ${{ matrix.os == 'ubuntu-20.04'}}
       name: Rename package (linux)    
       run:
+        sudo apt install -y rename
         rename -n 's/any/linux_x86_64/' dist/*.whl
     - if: ${{ matrix.os == 'windows-2019'}}
       name: Build shared library (windows)
