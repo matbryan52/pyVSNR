@@ -1,4 +1,3 @@
-graft data/
 include tests.py
 include examples.py
 include pyVSNR/*.cu
