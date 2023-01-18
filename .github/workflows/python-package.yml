@@ -18,11 +18,12 @@ on:
 jobs:
   build:
 
-    runs-on: ubuntu-latest
+    runs-on: ${{ matrix.os }}
     strategy:
       fail-fast: false
       matrix:
         python-version: ["3.10"]
+        os: [ubuntu-20.04, windows-2019]
 
     steps:
     - uses: actions/checkout@v3
@@ -38,12 +39,29 @@ jobs:
       run: |
         python -m pip install --upgrade pip
         pip install setuptools build
-    - name: Build shared library
+    - if: ${{ matrix.os == 'ubuntu-20.04'}
+      name: Build shared library (linux)
       run:
         nvcc -lcufft -lcublas --compiler-options '-fPIC' -o pyVSNR/libvsnr2d.so --shared pyVSNR/vsnr2d.cu
+      env:
+        PLATFORM_KEY: linux_x86_64
+    - if: ${{ matrix.os == 'windows-2019'}
+      name: Build shared library (windows)
+      run:
+        nvcc -lcufft -lcublas -o pyVSNR/libvsnr2d.dll --shared pyVSNR/vsnr2d.cu
+      env:
+        PLATFORM_KEY: win_amd_64        
     - name: Build package
       run:
         python -m build
+    - if: ${{ matrix.os == 'ubuntu-20.04'}    
+      name: Rename package (linux)    
+      run:
+        rename -n 's/any/linux_x86_64/' dist/*.whl
+    - if: ${{ matrix.os == 'windows-2019'}
+      name: Build shared library (windows)
+      run:
+        dir | rename-item -NewName {$_.name -replace 'any','win_amd_64'}
     - name: Upload package
       uses: actions/upload-artifact@v3
       with:
